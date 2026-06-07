@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>GenPlay Shop</title>
+    <title>GenPlay Cloud Phone</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -11,141 +11,678 @@
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            background: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #000000);
+            background: var(--tg-theme-bg-color, #0a0a0a);
+            color: var(--tg-theme-text-color, #ffffff);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            padding: 20px;
+            padding-bottom: 80px;
         }
-        .container {
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--tg-theme-secondary-bg-color, #1a1a1a);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0 20px;
+            border-top: 1px solid var(--tg-theme-hint-color, #333);
+            z-index: 100;
+        }
+
+        .nav-item {
+            text-align: center;
+            padding: 8px 0;
+            flex: 1;
+            cursor: pointer;
+            transition: 0.2s;
+            border-radius: 10px;
+            opacity: 0.6;
+        }
+
+        .nav-item.active {
+            opacity: 1;
+            color: var(--tg-theme-button-color, #2481cc);
+        }
+
+        .nav-item span {
+            font-size: 20px;
+            display: block;
+        }
+
+        .nav-item p {
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        .content {
+            padding: 20px;
             max-width: 500px;
             margin: 0 auto;
         }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
         .header {
             text-align: center;
-            margin-bottom: 30px;
-            padding: 20px 0;
-            background: var(--tg-theme-secondary-bg-color, #f5f5f5);
-            border-radius: 16px;
+            margin-bottom: 25px;
         }
+
         .header h1 {
-            font-size: 24px;
+            font-size: 22px;
             margin-bottom: 5px;
         }
-        .product {
-            background: var(--tg-theme-secondary-bg-color, #f5f5f5);
+
+        .balance-card {
+            background: linear-gradient(135deg, #2481cc, #1a5a8a);
+            padding: 15px;
             border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 12px;
+            text-align: center;
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: transform 0.2s;
         }
-        .product:active {
-            transform: scale(0.98);
+
+        .balance-label {
+            font-size: 14px;
+            opacity: 0.8;
         }
-        .product-info h3 {
-            margin-bottom: 5px;
-            font-size: 18px;
-        }
-        .product-info p {
-            color: var(--tg-theme-hint-color, #666);
-            font-size: 13px;
-        }
-        .price {
+
+        .balance-value {
+            font-size: 24px;
             font-weight: bold;
-            font-size: 20px;
-            color: var(--tg-theme-button-color, #2481cc);
         }
-        button {
-            background: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #ffffff);
-            border: none;
-            padding: 14px;
-            border-radius: 14px;
+
+        .game-selector {
+            background: var(--tg-theme-secondary-bg-color, #1a1a1a);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .game-name {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .pack-list {
+            background: var(--tg-theme-secondary-bg-color, #1a1a1a);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .pack-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid var(--tg-theme-hint-color, #333);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .pack-item.selected {
+            background: rgba(36, 129, 204, 0.2);
+            border-left: 3px solid #2481cc;
+        }
+
+        .pack-info h4 {
             font-size: 16px;
-            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .pack-price {
+            font-weight: bold;
+            font-size: 16px;
+            color: #2481cc;
+        }
+
+        .quantity-section {
+            background: var(--tg-theme-secondary-bg-color, #1a1a1a);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .quantity-btn {
+            background: #2481cc;
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .quantity-value {
+            font-size: 20px;
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .buy-btn {
+            background: #2481cc;
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: bold;
             width: 100%;
             cursor: pointer;
+        }
+
+        .input-group {
+            background: var(--tg-theme-secondary-bg-color, #1a1a1a);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            background: var(--tg-theme-bg-color, #0a0a0a);
+            color: white;
+            font-size: 16px;
+        }
+
+        .deposit-info {
+            background: var(--tg-theme-secondary-bg-color, #1a1a1a);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .deposit-info p {
+            margin: 10px 0;
+        }
+
+        .qr-code {
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .qr-code img {
+            width: 200px;
+            height: 200px;
+            background: white;
+            padding: 10px;
+            border-radius: 16px;
+        }
+
+        .history-item {
+            background: var(--tg-theme-secondary-bg-color, #1a1a1a);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .status-pending { color: #f39c12; }
+        .status-success { color: #2ecc71; }
+        .status-failed { color: #e74c3c; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1a1a1a;
+            border-radius: 20px;
+            padding: 24px;
+            width: 90%;
+            max-width: 350px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .modal-btn.confirm {
+            background: #2481cc;
+            color: white;
+        }
+
+        .modal-btn.cancel {
+            background: #444;
+            color: white;
+        }
+
+        .close-modal {
+            float: right;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-10 {
             margin-top: 10px;
         }
-        .note {
-            text-align: center;
-            margin-top: 20px;
+        
+        code {
+            background: #333;
+            padding: 4px 8px;
+            border-radius: 8px;
             font-size: 12px;
-            color: var(--tg-theme-hint-color, #999);
-        }
-        .divider {
-            height: 1px;
-            background: var(--tg-theme-hint-color, #ddd);
-            opacity: 0.3;
-            margin: 15px 0;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🛒 GENPLAY SHOP</h1>
-            <p>Cloud Phone 24/7 - Chạy auto không lo giật lag</p>
-        </div>
-
-        <div class="product" id="product30">
-            <div class="product-info">
-                <h3>🎮 Gói 30 Ngày</h3>
-                <p>Chạy 24/7, ổn định, tiết kiệm pin</p>
+    <div class="content">
+        <!-- Màn hình Mua Key -->
+        <div id="buyScreen" class="screen active">
+            <div class="balance-card">
+                <div>
+                    <div class="balance-label">💰 Số dư hiện tại</div>
+                    <div class="balance-value" id="balance">0</div>
+                </div>
+                <div style="font-size:12px;">VNĐ</div>
             </div>
-            <div class="price">150,000đ</div>
-        </div>
 
-        <div class="product" id="product90">
-            <div class="product-info">
-                <h3>⚡ Gói 90 Ngày</h3>
-                <p>Tiết kiệm 50k, tặng thêm 5 ngày</p>
+            <div class="header">
+                <h1>🛒 MUA KEY MỚI</h1>
+                <p>Chọn ứng dụng và gói ngày</p>
             </div>
-            <div class="price">400,000đ</div>
+
+            <div class="game-selector">
+                <div>
+                    <div class="game-name">🎮 GenPlay Cloud Phone</div>
+                    <div style="font-size:12px; opacity:0.7;">Snapdragon 835 | 6GB RAM | 64GB ROM</div>
+                </div>
+                <div>✅</div>
+            </div>
+
+            <div class="pack-list" id="packList">
+                <div class="pack-item" data-days="1" data-price="25000">
+                    <div><h4>⚡ 1 NGÀY</h4><div style="font-size:12px; opacity:0.7;">Dùng thử</div></div>
+                    <div class="pack-price">25,000đ</div>
+                </div>
+                <div class="pack-item" data-days="7" data-price="55000">
+                    <div><h4>🔥 7 NGÀY</h4><div style="font-size:12px; opacity:0.7;">Tiết kiệm 20k</div></div>
+                    <div class="pack-price">55,000đ</div>
+                </div>
+                <div class="pack-item" data-days="15" data-price="120000">
+                    <div><h4>💎 15 NGÀY</h4><div style="font-size:12px; opacity:0.7;">Tiết kiệm 55k</div></div>
+                    <div class="pack-price">120,000đ</div>
+                </div>
+                <div class="pack-item" data-days="30" data-price="185000">
+                    <div><h4>👑 30 NGÀY</h4><div style="font-size:12px; opacity:0.7;">Tiết kiệm 115k</div></div>
+                    <div class="pack-price">185,000đ</div>
+                </div>
+            </div>
+
+            <div class="quantity-section">
+                <div>Số lượng</div>
+                <div class="quantity-control">
+                    <div class="quantity-btn" id="minusQty">-</div>
+                    <div class="quantity-value" id="quantity">1</div>
+                    <div class="quantity-btn" id="plusQty">+</div>
+                </div>
+            </div>
+
+            <button class="buy-btn" id="buyBtn">💸 MUA NGAY</button>
         </div>
 
-        <div class="divider"></div>
+        <!-- Màn hình Nạp tiền -->
+        <div id="depositScreen" class="screen">
+            <div class="header">
+                <h1>💰 NẠP TIỀN</h1>
+                <p>Nạp tối thiểu: 10,000đ - Tối đa: 10,000,000đ</p>
+            </div>
 
-        <button id="buyButton">📦 MUA NGAY</button>
-        
-        <div class="note">
-            💳 Thanh toán qua chuyển khoản ngân hàng<br>
-            🔑 Nhận key tự động sau khi thanh toán
+            <div class="input-group">
+                <input type="number" id="depositAmount" placeholder="Nhập số tiền..." value="50000">
+            </div>
+
+            <button class="buy-btn" id="createDepositBtn">📝 TẠO ĐƠN NẠP</button>
+
+            <div style="margin-top: 20px;">
+                <h3>📜 Lịch sử nạp tiền</h3>
+                <div id="depositHistoryList">
+                    <div class="history-item">Chưa có giao dịch nào</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Màn hình Lịch sử -->
+        <div id="historyScreen" class="screen">
+            <div class="header">
+                <h1>📜 LỊCH SỬ MUA HÀNG</h1>
+            </div>
+            <div id="purchaseHistoryList">
+                <div class="history-item">Chưa có đơn hàng nào</div>
+            </div>
+        </div>
+
+        <!-- Màn hình Hồ sơ -->
+        <div id="profileScreen" class="screen">
+            <div class="header">
+                <h1>👤 HỒ SƠ CỦA TÔI</h1>
+            </div>
+            <div style="background:#1a1a1a; border-radius:16px; padding:20px; text-align:center;">
+                <div style="font-size:48px;">👤</div>
+                <p><strong><span id="profileName">...</span></strong></p>
+                <p style="font-size:12px; opacity:0.7;">ID: <span id="profileId">...</span></p>
+                <hr style="margin:15px 0; opacity:0.3;">
+                <p>💰 Số dư: <strong id="profileBalance">0</strong> VNĐ</p>
+                <p>📦 Đơn hàng: <strong id="orderCount">0</strong></p>
+                <hr style="margin:15px 0; opacity:0.3;">
+                <p>📞 <strong>@ZerestMods</strong></p>
+                <p>📱 <strong>@ZerestMod</strong></p>
+                <p style="font-size:11px; opacity:0.5; margin-top:10px;">📅 Tham gia: 21/5/2026</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item active" data-screen="buy">
+            <span>🛒</span>
+            <p>Mua Key</p>
+        </div>
+        <div class="nav-item" data-screen="deposit">
+            <span>💰</span>
+            <p>Nạp tiền</p>
+        </div>
+        <div class="nav-item" data-screen="history">
+            <span>📜</span>
+            <p>Lịch sử</p>
+        </div>
+        <div class="nav-item" data-screen="profile">
+            <span>👤</span>
+            <p>Hồ sơ</p>
+        </div>
+    </div>
+
+    <!-- Modal Thông tin nạp tiền -->
+    <div id="depositModal" class="modal">
+        <div class="modal-content">
+            <div class="close-modal" onclick="closeDepositModal()">✖</div>
+            <h3>💳 THÔNG TIN NẠP TIỀN</h3>
+            <div id="depositModalContent">
+                <p>Đang tạo đơn...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal xác nhận mua -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <h3>📦 XÁC NHẬN MUA</h3>
+            <p id="modalText"></p>
+            <div class="modal-buttons">
+                <div class="modal-btn cancel" id="cancelBtn">❌ Hủy</div>
+                <div class="modal-btn confirm" id="confirmBtn">✅ OK</div>
+            </div>
         </div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
-        tg.MainButton.hide();
         
-        let selectedProduct = null;
+        // User info
+        let user = tg.initDataUnsafe?.user || { first_name: "Khách", id: "Unknown" };
+        let userId = user.id || "Guest_" + Math.random().toString(36).substr(2, 8);
         
-        document.getElementById('product30').addEventListener('click', function() {
-            selectedProduct = '30_ngay';
-            tg.showAlert('✅ Đã chọn Gói 30 Ngày - 150,000đ\nBấm "MUA NGAY" để tiếp tục');
-            document.getElementById('product30').style.border = '2px solid var(--tg-theme-button-color, #2481cc)';
-            document.getElementById('product90').style.border = 'none';
-        });
+        // Data
+        let balance = 0;
+        let selectedDays = 1;
+        let selectedPrice = 25000;
+        let quantity = 1;
         
-        document.getElementById('product90').addEventListener('click', function() {
-            selectedProduct = '90_ngay';
-            tg.showAlert('✅ Đã chọn Gói 90 Ngày - 400,000đ\nBấm "MUA NGAY" để tiếp tục');
-            document.getElementById('product90').style.border = '2px solid var(--tg-theme-button-color, #2481cc)';
-            document.getElementById('product30').style.border = 'none';
-        });
+        // Histories
+        let purchaseHistory = [];
+        let depositHistory = [];
         
-        document.getElementById('buyButton').addEventListener('click', function() {
-            if (!selectedProduct) {
-                tg.showAlert('⚠️ Vui lòng chọn gói dịch vụ trước!');
+        // DOM elements
+        const packItems = document.querySelectorAll('.pack-item');
+        
+        function updateUI() {
+            document.getElementById('balance').innerText = balance.toLocaleString('vi-VN');
+            document.getElementById('profileBalance').innerText = balance.toLocaleString('vi-VN');
+            document.getElementById('quantity').innerText = quantity;
+            document.getElementById('orderCount').innerText = purchaseHistory.length;
+            
+            packItems.forEach(item => {
+                let price = parseInt(item.dataset.price);
+                if (price === selectedPrice) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+        }
+        
+        function showScreen(screenId) {
+            const screens = ['buy', 'deposit', 'history', 'profile'];
+            screens.forEach(id => {
+                document.getElementById(id + 'Screen').classList.remove('active');
+            });
+            document.getElementById(screenId + 'Screen').classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(item => {
+                if (item.dataset.screen === screenId) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+            
+            if (screenId === 'history') {
+                renderPurchaseHistory();
+            }
+            if (screenId === 'deposit') {
+                renderDepositHistory();
+            }
+            if (screenId === 'profile') {
+                document.getElementById('profileName').innerText = user.first_name || "Khách";
+                document.getElementById('profileId').innerText = user.id || userId;
+            }
+        }
+        
+        function renderPurchaseHistory() {
+            const container = document.getElementById('purchaseHistoryList');
+            if (purchaseHistory.length === 0) {
+                container.innerHTML = '<div class="history-item">📭 Chưa có đơn hàng nào</div>';
                 return;
             }
-            tg.sendData(JSON.stringify({ action: 'buy', product: selectedProduct }));
-            tg.showAlert('📝 Cảm ơn bạn! Vui lòng kiểm tra tin nhắn từ bot để hoàn tất thanh toán.');
+            container.innerHTML = purchaseHistory.map(h => `
+                <div class="history-item">
+                    🎮 GenPlay ${h.days} ngày x${h.quantity}
+                    <div style="float:right;">💰 ${h.total.toLocaleString('vi-VN')}đ</div>
+                    <div style="font-size:11px; opacity:0.7;">🕐 ${h.time}</div>
+                </div>
+            `).join('');
+        }
+        
+        function renderDepositHistory() {
+            const container = document.getElementById('depositHistoryList');
+            if (depositHistory.length === 0) {
+                container.innerHTML = '<div class="history-item">📭 Chưa có giao dịch nào</div>';
+                return;
+            }
+            container.innerHTML = depositHistory.map(h => `
+                <div class="history-item">
+                    💰 ${h.amount.toLocaleString('vi-VN')}đ
+                    <span class="status-${h.status}">${h.status === 'pending' ? '⏳ Chờ duyệt' : (h.status === 'success' ? '✅ Thành công' : '❌ Từ chối')}</span>
+                    <div style="font-size:11px; opacity:0.7;">🕐 ${h.time}</div>
+                </div>
+            `).join('');
+        }
+        
+        function createDepositOrder() {
+            let amount = parseInt(document.getElementById('depositAmount').value);
+            if (isNaN(amount) || amount < 10000) {
+                tg.showAlert('⚠️ Số tiền tối thiểu là 10,000đ!');
+                return;
+            }
+            if (amount > 10000000) {
+                tg.showAlert('⚠️ Số tiền tối đa là 10,000,000đ!');
+                return;
+            }
+            
+            let content = "NAP" + userId;
+            let momoLink = `https://me.momo.vn/${userId}`;
+            
+            let modalContent = document.getElementById('depositModalContent');
+            modalContent.innerHTML = `
+                <div class="text-center mt-10">
+                    <p><strong>🏦 Ví điện tử:</strong> MoMo</p>
+                    <p><strong>🔢 Số điện thoại:</strong> 0901371650</p>
+                    <p><strong>📛 Chủ TK:</strong> DUONG THI TU TRINH</p>
+                    <p><strong>💰 Số tiền:</strong> ${amount.toLocaleString('vi-VN')}đ</p>
+                    <p><strong>📝 Nội dung:</strong> <code>${content}</code></p>
+                    <div class="qr-code">
+                        <img src="https://img.vietqr.io/image/momo-0901371650-compact.png?amount=${amount}&addInfo=${content}&accountName=DUONG%20THI%20TU%20TRINH" alt="QR MoMo">
+                    </div>
+                    <p style="font-size:12px; color:#f39c12;">⏰ Đơn hết hạn sau 15 phút</p>
+                    <p style="font-size:11px; opacity:0.7;">💡 Mở app MoMo → Quét mã QR hoặc chuyển khoản đến số 0901371650<br>📝 Nội dung: <strong>${content}</strong></p>
+                </div>
+            `;
+            
+            depositHistory.unshift({
+                amount: amount,
+                status: 'pending',
+                time: new Date().toLocaleString('vi-VN')
+            });
+            
+            document.getElementById('depositModal').classList.add('active');
+            renderDepositHistory();
+            tg.sendData(JSON.stringify({ action: 'deposit', amount: amount, content: content }));
+        }
+        
+        function closeDepositModal() {
+            document.getElementById('depositModal').classList.remove('active');
+        }
+        
+                function purchase() {
+            let total = selectedPrice * quantity;
+            if (balance >= total) {
+                balance -= total;
+                purchaseHistory.unshift({
+                    days: selectedDays,
+                    quantity: quantity,
+                    total: total,
+                    time: new Date().toLocaleString('vi-VN')
+                });
+                updateUI();
+                renderPurchaseHistory();
+                tg.showAlert(`✅ MUA THÀNH CÔNG!\n📦 GenPlay ${selectedDays} ngày x${quantity}\n💰 ${total.toLocaleString('vi-VN')}đ`);
+                tg.sendData(JSON.stringify({ action: 'buy', days: selectedDays, quantity: quantity, total: total }));
+            } else {
+                tg.showAlert(`❌ SỐ DƯ KHÔNG ĐỦ!\nCần: ${total.toLocaleString('vi-VN')}đ\nHiện có: ${balance.toLocaleString('vi-VN')}đ\n📞 Liên hệ @ZerestMods để nạp thêm!`);
+            }
+            document.getElementById('confirmModal').classList.remove('active');
+        }
+        
+        // Event listeners cho nút tăng giảm số lượng
+        document.getElementById('minusQty').addEventListener('click', () => {
+            if (quantity > 1) quantity--;
+            updateUI();
         });
+        
+        document.getElementById('plusQty').addEventListener('click', () => {
+            quantity++;
+            updateUI();
+        });
+        
+        // Nút mua hàng
+        document.getElementById('buyBtn').addEventListener('click', () => {
+            let total = selectedPrice * quantity;
+            document.getElementById('modalText').innerHTML = `🛒 GenPlay ${selectedDays} ngày x${quantity}<br>💸 Tổng: ${total.toLocaleString('vi-VN')}đ?`;
+            document.getElementById('confirmModal').classList.add('active');
+        });
+        
+        // Nút tạo đơn nạp tiền
+        document.getElementById('createDepositBtn').addEventListener('click', createDepositOrder);
+        
+        // Nút xác nhận trong modal
+        document.getElementById('confirmBtn').addEventListener('click', purchase);
+        
+        // Nút hủy trong modal
+        document.getElementById('cancelBtn').addEventListener('click', () => {
+            document.getElementById('confirmModal').classList.remove('active');
+        });
+        
+        // Chuyển màn hình khi bấm nav item
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => showScreen(item.dataset.screen));
+        });
+        
+        // Chọn gói sản phẩm
+        packItems.forEach(item => {
+            item.addEventListener('click', () => {
+                selectedDays = parseInt(item.dataset.days);
+                selectedPrice = parseInt(item.dataset.price);
+                updateUI();
+            });
+        });
+        
+        // Set thông tin profile
+        document.getElementById('profileName').innerText = user.first_name || "Khách";
+        document.getElementById('profileId').innerText = user.id || userId;
+        
+        // Khởi tạo giao diện
+        updateUI();
+        renderPurchaseHistory();
+        renderDepositHistory();
     </script>
 </body>
 </html>
